@@ -3,10 +3,6 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartCursor
 {
@@ -18,7 +14,7 @@ namespace SmartCursor
         }
 
         private void ControlEvents_MouseChanged(object sender, EventArgsMouseStateChanged e) {
-            if (!Context.IsWorldReady || !Context.IsPlayerFree || Game1.player.isMoving() || Game1.player.isCharging || Game1.player.isRafting || Game1.player.isRidingHorse() || Game1.player.UsingTool) {
+            if (!Context.IsWorldReady || !Context.IsPlayerFree || Game1.player.isMoving() || Game1.player.isCharging || Game1.player.isRafting || Game1.player.isRidingHorse() || Game1.player.UsingTool || Game1.player.IsEmoting || !Game1.player.CanMove) {
                 return;
             }
 
