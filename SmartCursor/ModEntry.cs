@@ -80,7 +80,6 @@ namespace SmartCursor
         private int GetOctant(Vector2 screenPixels) {
             double angle = GetAngle(screenPixels);
 
-            Vector2 grabTile = Game1.player.getTileLocation();
             angle += 22.5;
 
             if (angle < 45) {
@@ -104,7 +103,7 @@ namespace SmartCursor
         }
 
         private void InputEvents_ButtonPressed(object sender, EventArgsInput e) {
-            if (!Context.IsWorldReady || !Context.IsPlayerFree || !(e.Button == SButton.MouseLeft) || Game1.player.isCharging || Game1.player.isRidingHorse() || Game1.player.UsingTool) {
+            if (!Context.IsWorldReady || !Context.IsPlayerFree || e.Button != SButton.MouseLeft || Game1.player.isCharging || Game1.player.isRidingHorse() || Game1.player.UsingTool) {
                 return;
             }
 
@@ -145,10 +144,8 @@ namespace SmartCursor
                 dir = Game1.right;
             }
 
-            e = new EventArgsInput(SButton.MouseLeft, new CursorPosition(cursor.AbsolutePixels, cursor.ScreenPixels, grabTile, grabTile), null);
             Game1.player.lastClick = grabTile * 64 + new Vector2(32, 32);
             Game1.player.FacingDirection = dir;
         }
-
     }
 }
