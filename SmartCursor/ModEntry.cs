@@ -7,13 +7,17 @@ using System;
 namespace SmartCursor
 {
     public class ModEntry : Mod {
-
+        /// <summary>The mod entry point, called after the mod is first loaded.</summary>
+        /// <param name="helper">Provides simplified APIs for writing mods.</param>
         public override void Entry(IModHelper helper) {
-            InputEvents.ButtonPressed += InputEvents_ButtonPressed;
-            ControlEvents.MouseChanged += ControlEvents_MouseChanged;
+            helper.Events.Input.ButtonPressed += OnButtonPressed;
+            helper.Events.Input.CursorMoved += OnCursorMoved;
         }
 
-        private void ControlEvents_MouseChanged(object sender, EventArgsMouseStateChanged e) {
+        /// <summary>Raised after the player moves the in-game cursor.</summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnCursorMoved(object sender, CursorMovedEventArgs e) {
             if (!Context.IsWorldReady || !Context.IsPlayerFree || Game1.player.isMoving() || Game1.player.isCharging || Game1.player.isRafting || Game1.player.isRidingHorse() || Game1.player.UsingTool || Game1.player.IsEmoting || !Game1.player.CanMove) {
                 return;
             }
@@ -21,7 +25,7 @@ namespace SmartCursor
             int dir = Game1.player.FacingDirection;
 
             Vector2 grabTile = new Vector2(1, 0);
-            switch(GetOctant(new Vector2(e.NewPosition.X, e.NewPosition.Y))) {
+            switch(GetOctant(new Vector2(e.NewPosition.ScreenPixels.X, e.NewPosition.ScreenPixels.Y))) {
                 case 0:
                     grabTile = new Vector2(1, 0);
                     dir = Game1.right;
@@ -80,7 +84,6 @@ namespace SmartCursor
         private int GetOctant(Vector2 screenPixels) {
             double angle = GetAngle(screenPixels);
 
-            Vector2 grabTile = Game1.player.getTileLocation();
             angle += 22.5;
 
             if (angle < 45) {
@@ -103,8 +106,11 @@ namespace SmartCursor
             return 0;            
         }
 
-        private void InputEvents_ButtonPressed(object sender, EventArgsInput e) {
-            if (!Context.IsWorldReady || !Context.IsPlayerFree || !(e.Button == SButton.MouseLeft) || Game1.player.isCharging || Game1.player.isRidingHorse() || Game1.player.UsingTool) {
+        /// <summary>Raised after the player presses a button on the keyboard, controller, or mouse.</summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e) {
+            if (!Context.IsWorldReady || !Context.IsPlayerFree || e.Button != SButton.MouseLeft || Game1.player.isCharging || Game1.player.isRidingHorse() || Game1.player.UsingTool) {
                 return;
             }
 
@@ -145,10 +151,8 @@ namespace SmartCursor
                 dir = Game1.right;
             }
 
-            e = new EventArgsInput(SButton.MouseLeft, new CursorPosition(cursor.AbsolutePixels, cursor.ScreenPixels, grabTile, grabTile), null);
             Game1.player.lastClick = grabTile * 64 + new Vector2(32, 32);
             Game1.player.FacingDirection = dir;
         }
-
     }
 }
